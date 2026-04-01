@@ -1,23 +1,21 @@
 import { PrismaClient } from "@prisma/client";
 
-type ConnectionObject = { isConnected: boolean };
-const connection: ConnectionObject = { isConnected: false };
+const prismaClientSingleton = () => {
+  return new PrismaClient();
+};
 
-let prisma: PrismaClient | undefined;
+declare const globalThis: {
+  prismaGlobal: ReturnType<typeof prismaClientSingleton>;
+} & typeof global;
+
+const prisma = globalThis.prismaGlobal ?? prismaClientSingleton();
+
+export default prisma;
+
+if (process.env.NODE_ENV !== "production") globalThis.prismaGlobal = prisma;
 
 export async function dbconnect(): Promise<PrismaClient> {
-  if (connection.isConnected && prisma) {
-    console.log("using existing connection");
-    return prisma;
-  }
-
-  try {
-    prisma = new PrismaClient();
-    connection.isConnected = true;
-    console.log("new connection created");
-    return prisma;
-  } catch (error) {
-    console.error("Error connecting to database:", error);
-    throw error;
-  }
+  // Prisma handles connection pooling and lazy connection automatically.
+  // This exported function is kept for compatibility with existing imports.
+  return prisma;
 }

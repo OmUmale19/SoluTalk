@@ -34,9 +34,9 @@ export default function StartCall() {
                 className={"z-50 flex items-center gap-1.5"}
                 onClick={() => {
                   connect()
-                    .then(() => {})
-                    .catch(() => {})
-                    .finally(() => {});
+                    .then(() => { console.log('Connected'); })
+                    .catch((err) => { console.error('Connection failed:', err); })
+                    .finally(() => { });
                 }}
               >
                 <span>Start Therapy</span>
